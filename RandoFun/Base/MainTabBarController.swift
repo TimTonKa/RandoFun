@@ -12,7 +12,16 @@ class MainTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        let fingerVC = FingerGameViewController()
+        fingerVC.tabBarItem = UITabBarItem(title: "Finger", image: UIImage(systemName: "hand.tap"), tag: 0)
+
+        let spinnerVC = SpinnerGameViewController()
+        spinnerVC.tabBarItem = UITabBarItem(title: "Spinner", image: UIImage(systemName: "arrow.2.circlepath.circle"), tag: 1)
+
+        let coinVC = CoinFlipGameViewController()
+        coinVC.tabBarItem = UITabBarItem(title: "Coin", image: UIImage(systemName: "bitcoinsign.circle"), tag: 2)
+
+        viewControllers = [fingerVC, spinnerVC, coinVC]
     }
     
 

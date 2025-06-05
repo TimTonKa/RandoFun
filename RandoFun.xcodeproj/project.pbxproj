@@ -88,10 +88,10 @@
 		A5B9BF402DF140B500FF2010 = {
 			isa = PBXGroup;
 			children = (
+				A5B9BF4A2DF140B500FF2010 /* Products */,
 				A5B9BF4B2DF140B500FF2010 /* RandoFun */,
 				A5B9BF622DF140BD00FF2010 /* RandoFunTests */,
 				A5B9BF6C2DF140BD00FF2010 /* RandoFunUITests */,
-				A5B9BF4A2DF140B500FF2010 /* Products */,
 			);
 			sourceTree = "<group>";
 		};

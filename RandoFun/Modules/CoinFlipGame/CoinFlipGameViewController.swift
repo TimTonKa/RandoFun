@@ -1,5 +1,5 @@
 //
-//  SpinnerGameViewController.swift
+//  CoinFlipGameViewController.swift
 //  RandoFun
 //
 //  Created by Tim Zheng on 2025/6/5.
@@ -7,12 +7,13 @@
 
 import UIKit
 
-class SpinnerGameViewController: UIViewController {
+class CoinFlipGameViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        view.backgroundColor = .systemBackground
+        title = "Coin Flip"
     }
     
 
