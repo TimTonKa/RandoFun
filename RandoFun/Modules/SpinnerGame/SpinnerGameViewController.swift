@@ -1,30 +1,102 @@
 //
-//  SpinnerGameViewController.swift
+//  SpinnerView.swift
 //  RandoFun
 //
-//  Created by Tim Zheng on 2025/6/5.
+//  Created by Tim Tseng on 2025/6/12.
 //
 
 import UIKit
 
+struct SpinnerOption {
+    var title: String
+    var weight: CGFloat // 占轉盤的比例，0.0 ~ 1.0 加總應為 1.0
+}
+
 class SpinnerGameViewController: UIViewController {
+
+    private let titleLabel: UITextField = {
+        let label = UITextField()
+        label.text = "吃什麼好呢？"
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
+        label.textColor = .white
+        label.backgroundColor = .clear
+        label.borderStyle = .none
+        label.clearButtonMode = .whileEditing
+        return label
+    }()
+
+    private let spinnerView = SpinnerView()
+    private let startButton = UIButton(type: .system)
+    private let settingsButton = UIButton(type: .system)
+
+    private var options: [SpinnerOption] = [
+        SpinnerOption(title: "壽司", weight: 0.2),
+        SpinnerOption(title: "牛肉麵", weight: 0.1),
+        SpinnerOption(title: "火鍋", weight: 0.1),
+        SpinnerOption(title: "漢堡", weight: 0.1),
+        SpinnerOption(title: "便當", weight: 0.5)
+    ]
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .black
 
-        view.backgroundColor = .systemBackground
-        title = "Spinner"
+        layoutUI()
+        spinnerView.setOptions(options)
     }
-    
 
-    /*
-    // MARK: - Navigation
+    private func layoutUI() {
+        view.addSubview(titleLabel)
+        view.addSubview(spinnerView)
+        view.addSubview(startButton)
+        view.addSubview(settingsButton)
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        spinnerView.translatesAutoresizingMaskIntoConstraints = false
+        startButton.translatesAutoresizingMaskIntoConstraints = false
+        settingsButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            spinnerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            spinnerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            spinnerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
+            spinnerView.heightAnchor.constraint(equalTo: spinnerView.widthAnchor),
+            
+            titleLabel.bottomAnchor.constraint(equalTo: spinnerView.topAnchor, constant: -25),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            startButton.topAnchor.constraint(equalTo: spinnerView.bottomAnchor, constant: 20),
+            startButton.centerXAnchor.constraint(equalTo: spinnerView.centerXAnchor),
+            startButton.heightAnchor.constraint(equalToConstant: 44),
+
+            settingsButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
+
+        startButton.setTitle("開始", for: .normal)
+        startButton.setTitleColor(.white, for: .normal)
+        startButton.titleLabel?.font = .boldSystemFont(ofSize: 20)
+        startButton.addTarget(self, action: #selector(startSpin), for: .touchUpInside)
+
+        settingsButton.setTitle("設定", for: .normal)
+        settingsButton.setTitleColor(.white, for: .normal)
+        settingsButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
     }
-    */
 
+    @objc private func startSpin() {
+        spinnerView.spinToRandomOption()
+    }
+
+    @objc private func openSettings() {
+        let settingsVC = SpinnerSettingsViewController(options: options)
+        settingsVC.onSave = { [weak self] updatedOptions in
+            self?.options = updatedOptions
+            self?.spinnerView.setOptions(updatedOptions)
+        }
+
+        let nav = UINavigationController(rootViewController: settingsVC)
+        nav.modalPresentationStyle = .formSheet
+        present(nav, animated: true)
+    }
 }

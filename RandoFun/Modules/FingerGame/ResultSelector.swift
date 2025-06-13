@@ -2,7 +2,7 @@
 //  ResultSelector.swift
 //  RandoFun
 //
-//  Created by Tim Zheng on 2025/6/6.
+//  Created by Tim Tseng on 2025/6/6.
 //
 
 import Foundation

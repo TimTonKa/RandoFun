@@ -2,7 +2,7 @@
 //  FingerGameViewController.swift
 //  RandoFun
 //
-//  Created by Tim Zheng on 2025/6/5.
+//  Created by Tim Tseng on 2025/6/5.
 //
 
 import UIKit
