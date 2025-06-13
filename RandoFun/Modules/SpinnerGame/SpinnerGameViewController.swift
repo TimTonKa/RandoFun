@@ -12,6 +12,11 @@ struct SpinnerOption {
     var weight: CGFloat // 占轉盤的比例，0.0 ~ 1.0 加總應為 1.0
 }
 
+struct SpinnerOptionStorage: Codable {
+    var title: String
+    var weight: Int? // 1~999，若為 nil 則表示未設定
+}
+
 class SpinnerGameViewController: UIViewController {
 
     private let titleLabel: UITextField = {
@@ -30,17 +35,19 @@ class SpinnerGameViewController: UIViewController {
     private let startButton = UIButton(type: .system)
     private let settingsButton = UIButton(type: .system)
 
-    private var options: [SpinnerOption] = [
-        SpinnerOption(title: "壽司", weight: 0.2),
-        SpinnerOption(title: "牛肉麵", weight: 0.1),
-        SpinnerOption(title: "火鍋", weight: 0.1),
-        SpinnerOption(title: "漢堡", weight: 0.1),
-        SpinnerOption(title: "便當", weight: 0.5)
-    ]
+    private var options: [SpinnerOption]!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
+        
+        options = UserDefaultsManager.shared.getSpinnerOptions() ?? [ // default fallback
+            SpinnerOption(title: "壽司", weight: 0.2),
+            SpinnerOption(title: "牛肉麵", weight: 0.2),
+            SpinnerOption(title: "火鍋", weight: 0.2),
+            SpinnerOption(title: "漢堡", weight: 0.2),
+            SpinnerOption(title: "便當", weight: 0.2)
+        ]
 
         layoutUI()
         spinnerView.setOptions(options)
@@ -93,6 +100,7 @@ class SpinnerGameViewController: UIViewController {
         settingsVC.onSave = { [weak self] updatedOptions in
             self?.options = updatedOptions
             self?.spinnerView.setOptions(updatedOptions)
+            UserDefaultsManager.shared.saveSpinnerOptions(updatedOptions)
         }
 
         let nav = UINavigationController(rootViewController: settingsVC)
