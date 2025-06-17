@@ -14,6 +14,14 @@ class SpinnerView: UIView {
     private var wheelLayer = CALayer()
     private var arrowLayer = CAShapeLayer()
     private var currentRotation: CGFloat = 0
+    
+    private var displayLink: CADisplayLink?
+    private var animationStartTime: CFTimeInterval = 0
+    private var animationDuration: CFTimeInterval = 3.0
+    private var startRotation: CGFloat = 0
+    private var endRotation: CGFloat = 0
+
+    var onSelectionUpdate: ((String) -> Void)? // <- 新增 callback
 
     func setOptions(_ options: [SpinnerOption]) {
         self.options = options
@@ -88,42 +96,94 @@ class SpinnerView: UIView {
 
     func spinToRandomOption() {
         resetSegmentAppearance()
-        
+
         let fullRotations: CGFloat = CGFloat(Int.random(in: 5...8)) * .pi * 2
         let randomOffset = CGFloat.random(in: 0..<1)
         let offsetAngle = 2 * .pi * randomOffset
         let totalRotation = fullRotations + offsetAngle
 
-        currentRotation = totalRotation.truncatingRemainder(dividingBy: 2 * .pi)
+        startRotation = 0
+        endRotation = totalRotation
+        animationStartTime = CACurrentMediaTime()
+        animationDuration = 3.0
 
         let animation = CABasicAnimation(keyPath: "transform.rotation.z")
-        animation.fromValue = 0
-        animation.toValue = totalRotation
-        animation.duration = 3.0
+        animation.fromValue = startRotation
+        animation.toValue = endRotation
+        animation.duration = animationDuration
         animation.timingFunction = CAMediaTimingFunction(name: .easeOut)
         animation.isRemovedOnCompletion = false
         animation.fillMode = .forwards
         wheelLayer.add(animation, forKey: "spin")
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
-            self?.highlightOptionForAngle(self?.currentRotation ?? 0)
+        // 開始追蹤動畫進度
+        startDisplayLink()
+    }
+
+    private func startDisplayLink() {
+        stopDisplayLink() // 確保不重複
+        displayLink = CADisplayLink(target: self, selector: #selector(updateDisplayLink))
+        displayLink?.add(to: .main, forMode: .common)
+    }
+
+    private func stopDisplayLink() {
+        displayLink?.invalidate()
+        displayLink = nil
+    }
+    
+    /// 回傳目前動畫呈現的旋轉角度（從 presentationLayer）
+    private func currentAnimatedRotation() -> CGFloat? {
+        guard let presentation = wheelLayer.presentation(),
+              let angle = presentation.value(forKeyPath: "transform.rotation.z") as? CGFloat else {
+            return nil
         }
+        return angle
+    }
+
+    private func notifyCurrentOption(at angle: CGFloat) {
+        let pointerAngle = (2 * .pi - angle).truncatingRemainder(dividingBy: 2 * .pi)
+        var start: CGFloat = 0
+        for (_, option) in options.enumerated() {
+            let end = start + (2 * .pi * option.weight)
+            if pointerAngle >= start && pointerAngle < end {
+                onSelectionUpdate?(option.title)
+                break
+            }
+            start = end
+        }
+    }
+    
+    @objc private func updateDisplayLink() {
+        guard let angle = currentAnimatedRotation() else { return }
+
+        notifyCurrentOption(at: angle)
+
+        let now = CACurrentMediaTime()
+        let elapsed = now - animationStartTime
+        if elapsed >= animationDuration {
+            stopDisplayLink()
+            currentRotation = endRotation.truncatingRemainder(dividingBy: 2 * .pi)
+            highlightOptionForAngle(currentRotation)
+        }
+    }
+    
+    private func easeOut(_ t: CGFloat) -> CGFloat {
+        return 1 - pow(1 - t, 3)
     }
 
     private func highlightOptionForAngle(_ angle: CGFloat) {
-        // 將動畫旋轉角度轉換成指針指向的角度
         let pointerAngle = (2 * .pi - angle).truncatingRemainder(dividingBy: 2 * .pi)
         var start: CGFloat = 0
         for (i, option) in options.enumerated() {
             let end = start + (2 * .pi * option.weight)
             if pointerAngle >= start && pointerAngle < end {
                 highlight(index: i)
+                onSelectionUpdate?(option.title)
                 break
             }
             start = end
         }
     }
-
 
     private func highlight(index: Int) {
         for (i, segment) in segments.enumerated() {
@@ -133,7 +193,7 @@ class SpinnerView: UIView {
             textLayer.foregroundColor = i == index ? UIColor.black.cgColor : UIColor.darkGray.cgColor
         }
     }
-    
+
     private func resetSegmentAppearance() {
         for segment in segments {
             segment.opacity = 1.0

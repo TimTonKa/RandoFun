@@ -30,6 +30,15 @@ class SpinnerGameViewController: UIViewController {
         label.clearButtonMode = .whileEditing
         return label
     }()
+    
+    private let selectedOptionLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        label.textColor = .lightGray
+        label.text = ""
+        return label
+    }()
 
     private let spinnerView = SpinnerView()
     private let startButton = UIButton(type: .system)
@@ -51,27 +60,37 @@ class SpinnerGameViewController: UIViewController {
 
         layoutUI()
         spinnerView.setOptions(options)
+        
+        // 接收轉盤即時更新結果的 callback
+        spinnerView.onSelectionUpdate = { [weak self] selectedTitle in
+            self?.selectedOptionLabel.text = selectedTitle
+        }
     }
 
     private func layoutUI() {
         view.addSubview(titleLabel)
+        view.addSubview(selectedOptionLabel)
         view.addSubview(spinnerView)
         view.addSubview(startButton)
         view.addSubview(settingsButton)
 
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        selectedOptionLabel.translatesAutoresizingMaskIntoConstraints = false
         spinnerView.translatesAutoresizingMaskIntoConstraints = false
         startButton.translatesAutoresizingMaskIntoConstraints = false
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
+            titleLabel.bottomAnchor.constraint(equalTo: selectedOptionLabel.topAnchor, constant: -8),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            selectedOptionLabel.bottomAnchor.constraint(equalTo: spinnerView.topAnchor, constant: -30),
+            selectedOptionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
             spinnerView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             spinnerView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             spinnerView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8),
             spinnerView.heightAnchor.constraint(equalTo: spinnerView.widthAnchor),
-            
-            titleLabel.bottomAnchor.constraint(equalTo: spinnerView.topAnchor, constant: -25),
-            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
             startButton.topAnchor.constraint(equalTo: spinnerView.bottomAnchor, constant: 20),
             startButton.centerXAnchor.constraint(equalTo: spinnerView.centerXAnchor),
