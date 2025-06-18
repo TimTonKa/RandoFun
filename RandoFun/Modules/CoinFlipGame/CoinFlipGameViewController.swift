@@ -31,6 +31,8 @@ class CoinFlipGameViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .black
         
+        coinStyle = UserDefaultsManager.shared.getSelectedCoinStyle() ?? "coin_classic"
+        
         // 建立 perspective 效果（不要設在 coinImageView 本身）
         var perspective = CATransform3DIdentity
         perspective.m34 = -1.0 / 500
@@ -193,6 +195,7 @@ class CoinFlipGameViewController: UIViewController {
     @objc private func openSettings() {
         let settingsVC = CoinSettingsViewController(currentStyle: coinStyle)
         settingsVC.onStyleChanged = { [weak self] newStyle in
+            UserDefaultsManager.shared.saveSelectedCoinStyle(newStyle)
             self?.coinStyle = newStyle
             self?.updateCoinImage(showHeads: true)
             self?.isHeads = true

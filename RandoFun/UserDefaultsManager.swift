@@ -15,6 +15,7 @@ final class UserDefaultsManager {
 
     private enum Keys {
         static let spinnerOptions = "SpinnerOptions"
+        static let selectedCoinStyle = "SelectedCoinStyle"
     }
 
         
@@ -40,5 +41,16 @@ final class UserDefaultsManager {
         if let data = try? JSONEncoder().encode(storage) {
             defaults.set(data, forKey: Keys.spinnerOptions)
         }
+    }
+    
+    func getSelectedCoinStyle() -> String? {
+        guard let style = defaults.string(forKey: Keys.selectedCoinStyle) else {
+            return nil
+        }
+        return style
+    }
+    
+    func saveSelectedCoinStyle(_ style: String) {
+        defaults.set(style, forKey: Keys.selectedCoinStyle)
     }
 }
