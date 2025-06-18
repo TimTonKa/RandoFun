@@ -86,6 +86,10 @@ class SpinnerOptionCell: UITableViewCell {
     @objc private func titleChanged() {
         onTitleChanged?(titleField.text ?? "")
     }
+    
+    func becomeFirstResponderIfNeeded() {
+        titleField.becomeFirstResponder()
+    }
 }
 
 // MARK: - PaddingLabel（自訂內距）

@@ -36,7 +36,7 @@ class SpinnerGameViewController: UIViewController {
         label.textAlignment = .center
         label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
         label.textColor = .lightGray
-        label.text = ""
+        label.text = "???"
         return label
     }()
 

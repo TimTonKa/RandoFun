@@ -13,7 +13,7 @@ class CoinFlipGameViewController: UIViewController {
     private let settingsButton = UIButton(type: .system)
     
     private var isHeads = true // true: heads, false: tails
-    private var coinStyle = "coin_classic" // coin asset prefix, like "default", "gold", etc.
+    private var coinStyle = UserDefaultsManager.shared.getSelectedCoinStyle() ?? "coin_classic" // coin asset prefix, like "default", "gold", etc.
     private var displayLink: CADisplayLink?
     private var animationStartTime: CFTimeInterval = 0
     private var animationDuration: CFTimeInterval = 1.0
@@ -30,8 +30,6 @@ class CoinFlipGameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
-        
-        coinStyle = UserDefaultsManager.shared.getSelectedCoinStyle() ?? "coin_classic"
         
         // 建立 perspective 效果（不要設在 coinImageView 本身）
         var perspective = CATransform3DIdentity

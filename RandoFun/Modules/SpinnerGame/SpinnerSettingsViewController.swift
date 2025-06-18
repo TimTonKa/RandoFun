@@ -34,11 +34,18 @@ class SpinnerSettingsViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "選項"
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
 
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "取消", style: .plain, target: self, action: #selector(cancelTapped))
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "儲存", style: .done, target: self, action: #selector(saveTapped))
@@ -55,6 +62,19 @@ class SpinnerSettingsViewController: UIViewController {
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+    }
+    
+    @objc private func keyboardWillShow(_ notification: Notification) {
+        guard let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+
+        let bottomInset = keyboardFrame.height - view.safeAreaInsets.bottom
+        tableView.contentInset.bottom = bottomInset
+        tableView.verticalScrollIndicatorInsets.bottom = bottomInset
+    }
+
+    @objc private func keyboardWillHide(_ notification: Notification) {
+        tableView.contentInset.bottom = 0
+        tableView.verticalScrollIndicatorInsets.bottom = 0
     }
 
     @objc private func cancelTapped() {
@@ -155,7 +175,15 @@ extension SpinnerSettingsViewController: UITableViewDataSource, UITableViewDeleg
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == settings.count {
             settings.append(SpinnerOptionSetting(title: "", weight: nil, percentText: "<1%"))
-            tableView.reloadData()
+            let newIndexPath = IndexPath(row: settings.count - 1, section: 0)
+            tableView.insertRows(at: [newIndexPath], with: .automatic)
+
+            // 自動捲到新的一行並讓該欄位成為第一回應者（需要配合 SpinnerOptionCell 支援）
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                if let cell = self.tableView.cellForRow(at: newIndexPath) as? SpinnerOptionCell {
+                    cell.becomeFirstResponderIfNeeded()
+                }
+            }
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }
