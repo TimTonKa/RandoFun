@@ -72,6 +72,7 @@ class CoinFlipGameViewController: UIViewController {
         // 初始化正反圖片
         updateCountIcons()
         
+        // 翻轉的硬幣
         coinImageView.contentMode = .scaleAspectFit
         view.addSubview(coinImageView)
         coinImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -82,12 +83,22 @@ class CoinFlipGameViewController: UIViewController {
         view.addSubview(flipButton)
         flipButton.translatesAutoresizingMaskIntoConstraints = false
 
+        // 設定按鈕
         let gearImage = UIImage(systemName: "gearshape")?.withRenderingMode(.alwaysTemplate)
         settingsButton.setImage(gearImage, for: .normal)
         settingsButton.tintColor = .white
         settingsButton.imageView?.contentMode = .scaleAspectFit
         view.addSubview(settingsButton)
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        
+        let resetButton = UIButton(type: .system)
+        let resetImage = UIImage(systemName: "arrow.counterclockwise")?.withRenderingMode(.alwaysTemplate)
+        resetButton.setImage(resetImage, for: .normal)
+        resetButton.tintColor = .white
+        resetButton.imageView?.contentMode = .scaleAspectFit
+        view.addSubview(resetButton)
+        resetButton.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             coinImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -100,7 +111,10 @@ class CoinFlipGameViewController: UIViewController {
             flipButton.heightAnchor.constraint(equalToConstant: 44),
 
             settingsButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+            settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            resetButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            resetButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
         ])
 
         // 全畫面觸控事件
@@ -109,6 +123,7 @@ class CoinFlipGameViewController: UIViewController {
 
         flipButton.addTarget(self, action: #selector(flipCoin), for: .touchUpInside)
         settingsButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
+        resetButton.addTarget(self, action: #selector(resetCount), for: .touchUpInside)
     }
     
     private func updateCountIcons() {
@@ -123,6 +138,7 @@ class CoinFlipGameViewController: UIViewController {
         coinImageView.image = UIImage(named: imageName)
     }
 
+    //MARK: - Button actions
     @objc private func flipCoin() {
         let totalRotation = Double.pi * Double(rotationCount)
         animationStartTime = CACurrentMediaTime()
@@ -207,5 +223,11 @@ class CoinFlipGameViewController: UIViewController {
         }
         let nav = UINavigationController(rootViewController: settingsVC)
         present(nav, animated: true)
+    }
+    
+    @objc private func resetCount() {
+        frontCount = 0
+        backCount = 0
+        updateCountIcons()
     }
 }
