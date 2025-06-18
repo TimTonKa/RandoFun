@@ -43,6 +43,7 @@ class SpinnerGameViewController: UIViewController {
     private let spinnerView = SpinnerView()
     private let startButton = UIButton(type: .system)
     private let settingsButton = UIButton(type: .system)
+    private let resetButton = UIButton(type: .system)
 
     private var options: [SpinnerOption]!
 
@@ -73,12 +74,14 @@ class SpinnerGameViewController: UIViewController {
         view.addSubview(spinnerView)
         view.addSubview(startButton)
         view.addSubview(settingsButton)
+        view.addSubview(resetButton)
 
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         selectedOptionLabel.translatesAutoresizingMaskIntoConstraints = false
         spinnerView.translatesAutoresizingMaskIntoConstraints = false
         startButton.translatesAutoresizingMaskIntoConstraints = false
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
+        resetButton.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             titleLabel.bottomAnchor.constraint(equalTo: selectedOptionLabel.topAnchor, constant: -8),
@@ -97,7 +100,10 @@ class SpinnerGameViewController: UIViewController {
             startButton.heightAnchor.constraint(equalToConstant: 44),
 
             settingsButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
-            settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+            settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            resetButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            resetButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
         ])
 
         startButton.setTitle("開始", for: .normal)
@@ -110,6 +116,12 @@ class SpinnerGameViewController: UIViewController {
         settingsButton.tintColor = .white
         settingsButton.imageView?.contentMode = .scaleAspectFit
         settingsButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
+        
+        let resetImage = UIImage(systemName: "arrow.counterclockwise")?.withRenderingMode(.alwaysTemplate)
+        resetButton.setImage(resetImage, for: .normal)
+        resetButton.tintColor = .white
+        resetButton.imageView?.contentMode = .scaleAspectFit
+        resetButton.addTarget(self, action: #selector(resetSpinState), for: .touchUpInside)
     }
 
     @objc private func startSpin() {
@@ -127,5 +139,10 @@ class SpinnerGameViewController: UIViewController {
         let nav = UINavigationController(rootViewController: settingsVC)
         nav.modalPresentationStyle = .formSheet
         present(nav, animated: true)
+    }
+    
+    @objc private func resetSpinState() {
+        selectedOptionLabel.text = "???"
+        spinnerView.resetHighlight()
     }
 }

@@ -207,4 +207,8 @@ class SpinnerView: UIView {
         super.layoutSubviews()
         setupWheel()
     }
+    
+    func resetHighlight() {
+        resetSegmentAppearance()
+    }
 }
