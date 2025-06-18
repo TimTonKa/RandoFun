@@ -105,8 +105,10 @@ class SpinnerGameViewController: UIViewController {
         startButton.titleLabel?.font = .boldSystemFont(ofSize: 20)
         startButton.addTarget(self, action: #selector(startSpin), for: .touchUpInside)
 
-        settingsButton.setTitle("設定", for: .normal)
-        settingsButton.setTitleColor(.white, for: .normal)
+        let gearImage = UIImage(systemName: "gearshape")?.withRenderingMode(.alwaysTemplate)
+        settingsButton.setImage(gearImage, for: .normal)
+        settingsButton.tintColor = .white
+        settingsButton.imageView?.contentMode = .scaleAspectFit
         settingsButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
     }
 

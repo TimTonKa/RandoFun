@@ -19,13 +19,13 @@ class CoinFlipGameViewController: UIViewController {
     private var animationDuration: CFTimeInterval = 1.0
     private var rotationCount = 6 // 翻轉 3 圈（6 次 180 度）
     
+    //Count view
     private let headsImageView = UIImageView()
     private let headsCountLabel = UILabel()
     private let tailsImageView = UIImageView()
     private let tailsCountLabel = UILabel()
-
-    private var headsCount = 0
-    private var tailsCount = 0
+    private var frontCount = 0
+    private var backCount = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -69,7 +69,7 @@ class CoinFlipGameViewController: UIViewController {
             countStack.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
 
-        // 放在這裡初始化正反圖片
+        // 初始化正反圖片
         updateCountIcons()
         
         coinImageView.contentMode = .scaleAspectFit
@@ -82,8 +82,10 @@ class CoinFlipGameViewController: UIViewController {
         view.addSubview(flipButton)
         flipButton.translatesAutoresizingMaskIntoConstraints = false
 
-        settingsButton.setTitle("設定", for: .normal)
-        settingsButton.setTitleColor(.white, for: .normal)
+        let gearImage = UIImage(systemName: "gearshape")?.withRenderingMode(.alwaysTemplate)
+        settingsButton.setImage(gearImage, for: .normal)
+        settingsButton.tintColor = .white
+        settingsButton.imageView?.contentMode = .scaleAspectFit
         view.addSubview(settingsButton)
         settingsButton.translatesAutoresizingMaskIntoConstraints = false
 
@@ -112,8 +114,8 @@ class CoinFlipGameViewController: UIViewController {
     private func updateCountIcons() {
         headsImageView.image = UIImage(named: "\(coinStyle)_front")
         tailsImageView.image = UIImage(named: "\(coinStyle)_back")
-        headsCountLabel.text = "\(headsCount)"
-        tailsCountLabel.text = "\(tailsCount)"
+        headsCountLabel.text = "\(frontCount)"
+        tailsCountLabel.text = "\(backCount)"
     }
 
     private func updateCoinImage(showHeads: Bool) {
@@ -166,9 +168,9 @@ class CoinFlipGameViewController: UIViewController {
             coinImageView.layer.transform = CATransform3DIdentity
             
             if isHeads {
-                headsCount += 1
+                frontCount += 1
             } else {
-                tailsCount += 1
+                backCount += 1
             }
             updateCountIcons()
             return
@@ -199,8 +201,8 @@ class CoinFlipGameViewController: UIViewController {
             self?.coinStyle = newStyle
             self?.updateCoinImage(showHeads: true)
             self?.isHeads = true
-            self?.headsCount = 0
-            self?.tailsCount = 0
+            self?.frontCount = 0
+            self?.backCount = 0
             self?.updateCountIcons()
         }
         let nav = UINavigationController(rootViewController: settingsVC)
