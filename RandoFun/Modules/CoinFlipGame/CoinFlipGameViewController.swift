@@ -18,6 +18,14 @@ class CoinFlipGameViewController: UIViewController {
     private var animationStartTime: CFTimeInterval = 0
     private var animationDuration: CFTimeInterval = 1.0
     private var rotationCount = 6 // 翻轉 3 圈（6 次 180 度）
+    
+    private let headsImageView = UIImageView()
+    private let headsCountLabel = UILabel()
+    private let tailsImageView = UIImageView()
+    private let tailsCountLabel = UILabel()
+
+    private var headsCount = 0
+    private var tailsCount = 0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +41,35 @@ class CoinFlipGameViewController: UIViewController {
     }
 
     private func setupUI() {
+        // 新增上方計數列 StackView
+        let countStack = UIStackView(arrangedSubviews: [headsImageView, headsCountLabel, tailsImageView, tailsCountLabel])
+        countStack.axis = .horizontal
+        countStack.spacing = 16
+        countStack.alignment = .center
+        countStack.distribution = .equalSpacing
+        view.addSubview(countStack)
+        countStack.translatesAutoresizingMaskIntoConstraints = false
+
+        headsImageView.contentMode = .scaleAspectFit
+        tailsImageView.contentMode = .scaleAspectFit
+        headsImageView.widthAnchor.constraint(equalToConstant: 48).isActive = true
+        headsImageView.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        tailsImageView.widthAnchor.constraint(equalToConstant: 48).isActive = true
+        tailsImageView.heightAnchor.constraint(equalToConstant: 48).isActive = true
+
+        headsCountLabel.textColor = .white
+        headsCountLabel.font = .monospacedDigitSystemFont(ofSize: 26, weight: .regular)
+        tailsCountLabel.textColor = .white
+        tailsCountLabel.font = .monospacedDigitSystemFont(ofSize: 26, weight: .regular)
+
+        NSLayoutConstraint.activate([
+            countStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            countStack.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ])
+
+        // 放在這裡初始化正反圖片
+        updateCountIcons()
+        
         coinImageView.contentMode = .scaleAspectFit
         view.addSubview(coinImageView)
         coinImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -68,6 +105,13 @@ class CoinFlipGameViewController: UIViewController {
 
         flipButton.addTarget(self, action: #selector(flipCoin), for: .touchUpInside)
         settingsButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
+    }
+    
+    private func updateCountIcons() {
+        headsImageView.image = UIImage(named: "\(coinStyle)_front")
+        tailsImageView.image = UIImage(named: "\(coinStyle)_back")
+        headsCountLabel.text = "\(headsCount)"
+        tailsCountLabel.text = "\(tailsCount)"
     }
 
     private func updateCoinImage(showHeads: Bool) {
@@ -118,6 +162,13 @@ class CoinFlipGameViewController: UIViewController {
             stopDisplayLink()
             updateCoinImage(showHeads: isHeads)
             coinImageView.layer.transform = CATransform3DIdentity
+            
+            if isHeads {
+                headsCount += 1
+            } else {
+                tailsCount += 1
+            }
+            updateCountIcons()
             return
         }
 
@@ -145,6 +196,9 @@ class CoinFlipGameViewController: UIViewController {
             self?.coinStyle = newStyle
             self?.updateCoinImage(showHeads: true)
             self?.isHeads = true
+            self?.headsCount = 0
+            self?.tailsCount = 0
+            self?.updateCountIcons()
         }
         let nav = UINavigationController(rootViewController: settingsVC)
         present(nav, animated: true)
