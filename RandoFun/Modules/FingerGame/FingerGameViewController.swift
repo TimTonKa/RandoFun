@@ -91,7 +91,7 @@ class FingerGameViewController: UIViewController {
             info.haloView = halo
         }
 
-        if !activeTouches.isEmpty {
+        if activeTouches.count >= 2 {
             countdownView.start(duration: 3) { [weak self] in
                 self?.logger.debug("countdown complete")
                 self?.handleCountdownFinished()
@@ -131,6 +131,12 @@ class FingerGameViewController: UIViewController {
                     logger.debug("✅ 有效參與(壓超過兩秒)")
                 }
             }
+        }
+                
+        if activeTouches.count < 2 {
+            countdownView.reset()
+            hasTriggeredCountdownResult = false
+            logger.debug("⛔️ 剩餘手指數不足，取消倒數")
         }
 
         if activeTouches.isEmpty {
