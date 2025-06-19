@@ -21,8 +21,9 @@ class FingerGameViewController: UIViewController {
     private var orbitStartTime: Date?
     private var orbitingHalo: HaloView?
     
-    private var winner: TouchInfo?
     private var gameFinished = false
+    
+    private let settingsButton = UIButton(type: .system)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,6 +31,7 @@ class FingerGameViewController: UIViewController {
         view.isMultipleTouchEnabled = true
 
         addCountdownView()
+        addSettingsButton()
     }
 
     private func addCountdownView() {
@@ -41,6 +43,30 @@ class FingerGameViewController: UIViewController {
             countdownView.widthAnchor.constraint(equalToConstant: 120),
             countdownView.heightAnchor.constraint(equalToConstant: 120)
         ])
+    }
+    
+    private func addSettingsButton() {
+        let gearImage = UIImage(systemName: "gearshape")?.withRenderingMode(.alwaysTemplate)
+        settingsButton.setImage(gearImage, for: .normal)
+        settingsButton.tintColor = .white
+        settingsButton.imageView?.contentMode = .scaleAspectFit
+        settingsButton.addTarget(self, action: #selector(openSettings), for: .touchUpInside)
+
+        view.addSubview(settingsButton)
+        settingsButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            settingsButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            settingsButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            settingsButton.widthAnchor.constraint(equalToConstant: 32),
+            settingsButton.heightAnchor.constraint(equalToConstant: 32)
+        ])
+    }
+    
+    @objc private func openSettings() {
+        let settingsVC = FingerGameSettingsViewController()
+        let nav = UINavigationController(rootViewController: settingsVC)
+        present(nav, animated: true)
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -121,6 +147,12 @@ class FingerGameViewController: UIViewController {
         logger.debug("🚀 倒數結束，開始繞圈動畫")
         let valid = activeTouches.values.filter { $0.duration >= validTouchDelay }
         guard !valid.isEmpty else { return }
+        
+        let duration = UserDefaultsManager.shared.getOrbitDuration()
+        let orbitDuration = duration > 0 ? duration : 4.0
+        
+        let count = UserDefaultsManager.shared.getMaxWinners()
+        let winnerCount = (1...4).contains(count) ? count : 1
 
         orbitStartTime = Date()
 
@@ -129,7 +161,7 @@ class FingerGameViewController: UIViewController {
                   let start = self.orbitStartTime else { return }
 
             let elapsed = Date().timeIntervalSince(start)
-            if elapsed >= 4.0 {
+            if elapsed >= orbitDuration {
                 self.orbitTimer?.invalidate()
                 self.orbitTimer = nil
                 
@@ -138,13 +170,8 @@ class FingerGameViewController: UIViewController {
                 self.orbitingHalo = nil
 
                 // 🎉 最後選出勝者
-                if let selected = ResultSelector.pickWinner(from: valid) {
-                    self.winner = selected
-                    self.gameFinished = true
-                    selected.haloView?.alpha = 1.0
-                    self.highlightWinner(selected)
-                    self.dimLosers(except: selected)
-                }
+                ResultSelector.pickWinners(from: valid, winnerCount: winnerCount)
+                self.gameFinished = true
                 return
             }
 
@@ -161,25 +188,5 @@ class FingerGameViewController: UIViewController {
                 }
             }
         }
-    }
-    
-    private func highlightWinner(_ winner: TouchInfo) {
-        if orbitingHalo !== winner.haloView {
-            orbitingHalo?.stopOrbitAnimation()
-        }
-        orbitingHalo = winner.haloView
-        orbitingHalo?.startOrbitAnimation(dotCount: 10)
-        orbitingHalo?.alpha = 1.0
-    }
-
-    private func dimLosers(except winner: TouchInfo) {
-        for info in activeTouches.values where info.id != winner.id {
-            info.haloView?.alpha = 0.3
-            info.haloView?.stopOrbitAnimation()
-        }
-    }
-
-    func validParticipants() -> [TouchInfo] {
-        return activeTouches.values.filter { $0.isValid }
     }
 }

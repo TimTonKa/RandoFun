@@ -16,6 +16,8 @@ final class UserDefaultsManager {
     private enum Keys {
         static let spinnerOptions = "SpinnerOptions"
         static let selectedCoinStyle = "SelectedCoinStyle"
+        static let maxWinnersKey = "fingerGame_maxWinners"
+        static let orbitDurationKey = "fingerGame_orbitDuration"
     }
 
         
@@ -52,5 +54,23 @@ final class UserDefaultsManager {
     
     func saveSelectedCoinStyle(_ style: String) {
         defaults.set(style, forKey: Keys.selectedCoinStyle)
+    }
+    
+    func getMaxWinners() -> Int {
+        let maxWinner = defaults.integer(forKey: Keys.maxWinnersKey)
+        return maxWinner
+    }
+    
+    func saveMaxWinners(_ max: Int) {
+        defaults.set(max, forKey: Keys.maxWinnersKey)
+    }
+    
+    func getOrbitDuration() -> Double {
+        let orbitDuration = defaults.double(forKey: Keys.orbitDurationKey)
+        return orbitDuration
+    }
+    
+    func saveOrbitDuration(_ orbitDuration: Double) {
+        defaults.set(orbitDuration, forKey: Keys.orbitDurationKey)
     }
 }
