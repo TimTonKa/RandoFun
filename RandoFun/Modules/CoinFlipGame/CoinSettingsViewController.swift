@@ -2,7 +2,7 @@
 //  CoinSettingsViewController.swift
 //  RandoFun
 //
-//  Created by Tim Zheng on 2025/6/18.
+//  Created by Tim Tseng on 2025/6/18.
 //
 
 import UIKit
