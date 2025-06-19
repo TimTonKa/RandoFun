@@ -44,7 +44,7 @@ class CoinFlipGameViewController: UIViewController {
         // 新增上方計數列 StackView
         let countStack = UIStackView(arrangedSubviews: [headsImageView, headsCountLabel, tailsImageView, tailsCountLabel])
         countStack.axis = .horizontal
-        countStack.spacing = 16
+        countStack.spacing = 8
         countStack.alignment = .center
         countStack.distribution = .equalSpacing
         view.addSubview(countStack)
@@ -67,7 +67,7 @@ class CoinFlipGameViewController: UIViewController {
             countStack.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
 
-        // 初始化正反圖片
+        // 初始化計數正反圖片
         updateCountIcons()
         
         // 翻轉的硬幣
@@ -100,7 +100,7 @@ class CoinFlipGameViewController: UIViewController {
 
         NSLayoutConstraint.activate([
             coinImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            coinImageView.bottomAnchor.constraint(equalTo: flipButton.topAnchor, constant: -20),
+            coinImageView.bottomAnchor.constraint(equalTo: flipButton.topAnchor, constant: 45),
             coinImageView.widthAnchor.constraint(equalToConstant: 250),
             coinImageView.heightAnchor.constraint(equalToConstant: 250),
 
