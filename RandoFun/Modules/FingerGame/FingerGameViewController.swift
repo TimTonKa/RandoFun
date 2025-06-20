@@ -70,10 +70,17 @@ class FingerGameViewController: UIViewController {
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard !UserDefaultsManager.shared.isLimitReached(for: .finger) else {
+            presentUpgradeViewController()
+            return
+        }
+        
         if gameFinished {
             logger.debug("🎮 遊戲已完成，等待所有手指離開，忽略新手指加入")
             return
         }
+        
+        UserDefaultsManager.shared.incrementUsage(for: .finger)
         
         countdownView.reset()
 

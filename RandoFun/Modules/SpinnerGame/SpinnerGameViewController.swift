@@ -125,6 +125,13 @@ class SpinnerGameViewController: UIViewController {
     }
 
     @objc private func startSpin() {
+        guard !UserDefaultsManager.shared.isLimitReached(for: .spinner) else {
+            presentUpgradeViewController()
+            return
+        }
+        
+        UserDefaultsManager.shared.incrementUsage(for: .spinner)
+        
         spinnerView.spinToRandomOption()
     }
 

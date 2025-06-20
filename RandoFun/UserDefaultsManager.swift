@@ -18,18 +18,22 @@ final class UserDefaultsManager {
         static let selectedCoinStyle = "SelectedCoinStyle"
         static let maxWinnersKey = "fingerGame_maxWinners"
         static let orbitDurationKey = "fingerGame_orbitDuration"
+
+        static let coinUsage = "coinFlipUsageCount"
+        static let fingerUsage = "fingerGameUsageCount"
+        static let spinnerUsage = "spinnerGameUsageCount"
     }
 
-        
+    // MARK: - Spinner
     func getSpinnerOptions() -> [SpinnerOption]? {
         guard let data = defaults.data(forKey: Keys.spinnerOptions),
               let stored = try? JSONDecoder().decode([SpinnerOptionStorage].self, from: data) else {
-            return nil // fallback to default
+            return nil
         }
 
         let valid = stored.filter { !$0.title.trimmingCharacters(in: .whitespaces).isEmpty }
         let total = valid.compactMap { $0.weight }.reduce(0, +)
-        
+
         return valid.map { item in
             let w = CGFloat(item.weight ?? 0)
             let ratio = (total > 0 && item.weight != nil) ? (w / CGFloat(total)) : (1.0 / CGFloat(valid.count))
@@ -44,33 +48,61 @@ final class UserDefaultsManager {
             defaults.set(data, forKey: Keys.spinnerOptions)
         }
     }
-    
+
+    // MARK: - Coin
     func getSelectedCoinStyle() -> String? {
-        guard let style = defaults.string(forKey: Keys.selectedCoinStyle) else {
-            return nil
-        }
-        return style
+        return defaults.string(forKey: Keys.selectedCoinStyle)
     }
-    
+
     func saveSelectedCoinStyle(_ style: String) {
         defaults.set(style, forKey: Keys.selectedCoinStyle)
     }
-    
+
+    // MARK: - Finger
     func getMaxWinners() -> Int {
-        let maxWinner = defaults.integer(forKey: Keys.maxWinnersKey)
-        return maxWinner
+        return defaults.integer(forKey: Keys.maxWinnersKey)
     }
-    
+
     func saveMaxWinners(_ max: Int) {
         defaults.set(max, forKey: Keys.maxWinnersKey)
     }
-    
+
     func getOrbitDuration() -> Double {
-        let orbitDuration = defaults.double(forKey: Keys.orbitDurationKey)
-        return orbitDuration
+        return defaults.double(forKey: Keys.orbitDurationKey)
     }
-    
+
     func saveOrbitDuration(_ orbitDuration: Double) {
         defaults.set(orbitDuration, forKey: Keys.orbitDurationKey)
+    }
+
+    // MARK: - Usage Limit Control
+    enum GameType {
+        case coin, finger, spinner
+
+        var key: String {
+            switch self {
+            case .coin: return Keys.coinUsage
+            case .finger: return Keys.fingerUsage
+            case .spinner: return Keys.spinnerUsage
+            }
+        }
+    }
+
+    func getUsageCount(for type: GameType) -> Int {
+        return defaults.integer(forKey: type.key)
+    }
+
+    func incrementUsage(for type: GameType) {
+        let count = getUsageCount(for: type)
+        defaults.set(count + 1, forKey: type.key)
+    }
+
+    func resetUsage(for type: GameType) {
+        defaults.set(0, forKey: type.key)
+    }
+
+    @MainActor func isLimitReached(for type: GameType, limit: Int = 10) -> Bool {
+        guard !InAppPurchaseManager.shared.isPurchased else { return false }
+        return getUsageCount(for: type) >= limit
     }
 }

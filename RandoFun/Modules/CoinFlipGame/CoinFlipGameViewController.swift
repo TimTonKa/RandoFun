@@ -138,6 +138,13 @@ class CoinFlipGameViewController: UIViewController {
 
     //MARK: - Button actions
     @objc private func flipCoin() {
+        guard !UserDefaultsManager.shared.isLimitReached(for: .coin) else {
+            presentUpgradeViewController()
+            return
+        }
+        
+        UserDefaultsManager.shared.incrementUsage(for: .coin)
+        
         let totalRotation = Double.pi * Double(rotationCount)
         animationStartTime = CACurrentMediaTime()
 

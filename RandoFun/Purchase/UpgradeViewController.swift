@@ -17,6 +17,9 @@ class UpgradeViewController: UIViewController {
 
     private func setupUI() {
         view.backgroundColor = .black
+        
+        let closeButton = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(closeSelf))
+        navigationItem.rightBarButtonItem = closeButton
 
         // 標題
         titleLabel.text = "升級解鎖所有功能"
@@ -90,6 +93,10 @@ class UpgradeViewController: UIViewController {
             restoreButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
         ])
     }
+    
+    @objc private func closeSelf() {
+        dismiss(animated: true)
+    }
 
     @objc private func handleUpgrade() {
         guard !iapManager.isPurchased else { return }
@@ -143,5 +150,15 @@ class UpgradeViewController: UIViewController {
             upgradeButton.backgroundColor = .systemBlue
             upgradeButton.isEnabled = true
         }
+    }
+}
+
+
+extension UIViewController {
+    func presentUpgradeViewController() {
+        let upgradeVC = UpgradeViewController()
+        let nav = UINavigationController(rootViewController: upgradeVC)
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true)
     }
 }
