@@ -19,6 +19,8 @@ class CoinFlipGameViewController: UIViewController {
     private var animationDuration: CFTimeInterval = 1.0
     private var rotationCount = 6 // 翻轉 3 圈（6 次 180 度）
     
+    private var isFlipping = false
+    
     //Count view
     private let headsImageView = UIImageView()
     private let headsCountLabel = UILabel()
@@ -143,6 +145,9 @@ class CoinFlipGameViewController: UIViewController {
             return
         }
         
+        guard !isFlipping else { return }
+        isFlipping = true
+        
         UserDefaultsManager.shared.incrementUsage(for: .coin)
         
         let totalRotation = Double.pi * Double(rotationCount)
@@ -194,6 +199,7 @@ class CoinFlipGameViewController: UIViewController {
                 backCount += 1
             }
             updateCountIcons()
+            isFlipping = false
             return
         }
 
