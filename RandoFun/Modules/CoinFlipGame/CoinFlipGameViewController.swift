@@ -148,8 +148,6 @@ class CoinFlipGameViewController: UIViewController {
         guard !isFlipping else { return }
         isFlipping = true
         
-        UserDefaultsManager.shared.incrementUsage(for: .coin)
-        
         let totalRotation = Double.pi * Double(rotationCount)
         animationStartTime = CACurrentMediaTime()
 
@@ -192,6 +190,8 @@ class CoinFlipGameViewController: UIViewController {
             stopDisplayLink()
             updateCoinImage(showHeads: isHeads)
             coinImageView.layer.transform = CATransform3DIdentity
+            
+            UserDefaultsManager.shared.incrementUsage(for: .coin)
             
             if isHeads {
                 frontCount += 1
