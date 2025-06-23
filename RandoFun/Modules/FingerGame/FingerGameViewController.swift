@@ -80,8 +80,6 @@ class FingerGameViewController: UIViewController {
             return
         }
         
-        UserDefaultsManager.shared.incrementUsage(for: .finger)
-        
         countdownView.reset()
 
         for touch in touches {
@@ -185,6 +183,8 @@ class FingerGameViewController: UIViewController {
                 // 🎉 最後選出勝者
                 ResultSelector.pickWinners(from: valid, winnerCount: winnerCount)
                 self.gameFinished = true
+                
+                UserDefaultsManager.shared.incrementUsage(for: .finger)
                 return
             }
 
