@@ -67,6 +67,7 @@ class SpinnerGameViewController: UIViewController {
         // 接收轉盤即時更新結果的 callback
         spinnerView.onSelectionUpdate = { [weak self] selectedTitle in
             self?.selectedOptionLabel.text = selectedTitle
+            UserDefaultsManager.shared.incrementUsage(for: .spinner)
         }
     }
 
@@ -134,8 +135,6 @@ class SpinnerGameViewController: UIViewController {
         
         guard !isSpinning else { return }
         isSpinning = true
-        
-        UserDefaultsManager.shared.incrementUsage(for: .spinner)
         
         spinnerView.spinToRandomOption()
     }
