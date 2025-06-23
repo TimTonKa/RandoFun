@@ -44,6 +44,8 @@ class SpinnerGameViewController: UIViewController {
     private let startButton = UIButton(type: .system)
     private let settingsButton = UIButton(type: .system)
     private let resetButton = UIButton(type: .system)
+    
+    private var isSpinning = false
 
     private var options: [SpinnerOption]!
 
@@ -129,6 +131,9 @@ class SpinnerGameViewController: UIViewController {
             presentUpgradeViewController()
             return
         }
+        
+        guard !isSpinning else { return }
+        isSpinning = true
         
         UserDefaultsManager.shared.incrementUsage(for: .spinner)
         
