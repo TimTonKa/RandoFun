@@ -1,3 +1,10 @@
+//
+//  InAppPurchaseManager.swift
+//  RandoFun
+//
+//  Created by Tim Tseng on 2025/6/19.
+//
+
 import UIKit
 
 class UpgradeViewController: UIViewController {
